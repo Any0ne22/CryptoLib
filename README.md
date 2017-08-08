@@ -12,4 +12,5 @@ CryptoLib v1.0 implèmente les algorithmes suivants:
 -RSA ([CryptoRSA](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoRSA))  
 
 Versions:  
--C#: v1.0
+-C#: v1.0  
+-Java: v1.0
