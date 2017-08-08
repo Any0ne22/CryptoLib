@@ -24,7 +24,7 @@ CryptoLib v1.0 implèmente les algorithmes suivants:
 
 ## CryptoAES C#
 
-> This example shows how to secure data CryptoLib using AES algorithm in C#.
+> This example shows how to secure data with CryptoLib using AES algorithm in C#.
 
 `CryptoAES crypto = new CryptoAES("password");`  
 `string cipheredData = crypto.EncryptString("some clear text");`  
@@ -32,7 +32,7 @@ CryptoLib v1.0 implèmente les algorithmes suivants:
 
 ## CryptoAES Java
 
-> This example shows how to secure data CryptoLib using AES algorithm in Java.
+> This example shows how to secure data with CryptoLib using AES algorithm in Java.
 
 `CryptoLib.CryptoAES crypto = new CryptoAES("password");`  
 `String cipheredData = crypto.EncryptString("some clear text");`  
