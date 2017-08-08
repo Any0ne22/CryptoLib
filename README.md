@@ -1,6 +1,6 @@
 # CryptoLib  
 ## EN:
-A simple to use and multi-language cryptographic library.
+CryptoLib is a simple to use and multi-language cryptographic library.
 
 
 ## FR:
