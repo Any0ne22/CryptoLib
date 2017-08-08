@@ -36,10 +36,10 @@ CryptoLib v1.0 implèmente les algorithmes suivants:
 
 > This example show how to secure a data transfer between two users (user1 and user2) with CryptoLib using RSA algorithm in Java.
 
-`user1 = new CryptoRSA(2048);`  
+`CryptoLib.CryptoRSA user1 = new CryptoRSA(2048);`  
 `String user1PublicKey= user1.ExportPublicKeyString();`  
 
-`user2 = new CryptoRSA();`  
+`CryptoLib.CryptoRSA user2 = new CryptoRSA();`  
 `user2.ImportPublicKeyString(user1PublicKey);`  
 `String cipheredData = user2.EncryptString("some clear text");`  
 
