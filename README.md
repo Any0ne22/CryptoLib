@@ -16,3 +16,19 @@ CryptoLib v1.0 implèmente les algorithmes suivants:
 ### Versions:  
 -C#: v1.0  
 -Java: v1.0
+
+
+# Examples  
+## CryptoRSA C#
+
+
+`
+CryptoRSA user1 = new CryptoRSA(2048);
+string user1PublicKey= user1.ExportPublicKeyString();
+
+CryptoRSA user2 = new CryptoRSA();
+user2.ImportPublicKeyString(user1PublicKey);
+string cipheredData = user2.EncryptString("some clear text");
+
+string decipheredData = user1.DecryptString(cipheredData);
+`
