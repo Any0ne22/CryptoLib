@@ -19,6 +19,15 @@ CryptoLib v1.0 implèmente les algorithmes suivants:
 
 
 # Examples  
+
+## CryptoAES C#
+
+> This example show how to secure data CryptoLib using AES algorithm in C#.
+
+`CryptoAES crypto = new CryptoAES("password");`  
+`string cipheredData = crypto.EncryptString("some clear text");`  
+`string decipheredData = crypto.DecryptString(cipheredData);`  
+
 ## CryptoRSA C#
 
 > This example show how to secure a data transfer between two users (user1 and user2) with CryptoLib using RSA algorithm in C#.
