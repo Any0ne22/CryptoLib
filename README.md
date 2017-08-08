@@ -21,7 +21,7 @@ CryptoLib v1.0 implèmente les algorithmes suivants:
 # Examples  
 ## CryptoRSA C#
 
-
+> This example show how to secure a data transfer between two users (user1 and user2) using RSA algorithm in c#.
 
 `CryptoRSA user1 = new CryptoRSA(2048);`  
 `string user1PublicKey= user1.ExportPublicKeyString();`  
