@@ -22,7 +22,7 @@ CryptoLib v1.0 implèmente les algorithmes suivants:
 
 ## CryptoAES C#
 
-> This example show how to secure data CryptoLib using AES algorithm in C#.
+> This example shows how to secure data CryptoLib using AES algorithm in C#.
 
 `CryptoAES crypto = new CryptoAES("password");`  
 `string cipheredData = crypto.EncryptString("some clear text");`  
@@ -30,7 +30,7 @@ CryptoLib v1.0 implèmente les algorithmes suivants:
 
 ## CryptoRSA C#
 
-> This example show how to secure a data transfer between two users (user1 and user2) with CryptoLib using RSA algorithm in C#.
+> This example shows how to secure a data transfer between two users (user1 and user2) with CryptoLib using RSA algorithm in C#.
 
 `CryptoRSA user1 = new CryptoRSA(2048);`  
 `string user1PublicKey= user1.ExportPublicKeyString();`  
@@ -43,7 +43,7 @@ CryptoLib v1.0 implèmente les algorithmes suivants:
 
 ## CryptoRSA Java
 
-> This example show how to secure a data transfer between two users (user1 and user2) with CryptoLib using RSA algorithm in Java.
+> This example shows how to secure a data transfer between two users (user1 and user2) with CryptoLib using RSA algorithm in Java.
 
 `CryptoLib.CryptoRSA user1 = new CryptoRSA(2048);`  
 `String user1PublicKey= user1.ExportPublicKeyString();`  
