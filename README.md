@@ -1,7 +1,7 @@
 # CryptoLib  
 ## EN:
 CryptoLib is a user-friendly and multi-language cryptographic library.
-The purpose of this library is to allow developers to cipher and decipher datas as simple as possible. With CryptoLib it is easy for  the developers to implement strong and secured cryptographic algorithms without an important knowledge on cryptography.  
+The purpose of this library is to allow developers to cipher and decipher data as simple as possible. With CryptoLib it is easy for  the developers to implement strong and secured cryptographic algorithms without an important knowledge on cryptography.  
 
 CryptoLib is available in multiples languages (C#, Java) and the syntax practically the same (same objects/types/methods) to facilitate the passing from a language to another (keys can be generated in a language, exported then imported in another language).  
 
