@@ -20,7 +20,7 @@ CryptoLib est disponible dans plusieurs languages (C#, Java) et la syntaxe des o
 
 La documentation détaillée de CryptoLib est disponible sur le [wiki](https://github.com/Any0ne22/CryptoLib/wiki).
 
-CryptoLib v1.0 implèmente les algorithmes suivants:  
+CryptoLib v1.0 implémente les algorithmes suivants:  
 -AES ([CryptoAES](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoAES))  
 -RSA ([CryptoRSA](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoRSA))  
 
