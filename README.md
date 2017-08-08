@@ -11,6 +11,6 @@ CryptoLib v1.0 implèmente les algorithmes suivants:
 -AES ([CryptoAES](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoAES))  
 -RSA ([CryptoRSA](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoRSA))  
 
-Versions:  
+### Versions:  
 -C#: v1.0  
 -Java: v1.0
