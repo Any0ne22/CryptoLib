@@ -53,7 +53,7 @@ CryptoLib v1.0 implémente les algorithmes suivants:
 > This example shows how to secure a data transfer between two users (user1 and user2) with CryptoLib using RSA algorithm in C#.
 
 `CryptoRSA user1 = new CryptoRSA(2048);`  
-`string user1PublicKey= user1.ExportPublicKeyString();`  
+`string user1PublicKey = user1.ExportPublicKeyString();`  
 
 `CryptoRSA user2 = new CryptoRSA();`  
 `user2.ImportPublicKeyString(user1PublicKey);`  
@@ -66,7 +66,7 @@ CryptoLib v1.0 implémente les algorithmes suivants:
 > This example shows how to secure a data transfer between two users (user1 and user2) with CryptoLib using RSA algorithm in Java.
 
 `CryptoLib.CryptoRSA user1 = new CryptoRSA(2048);`  
-`String user1PublicKey= user1.ExportPublicKeyString();`  
+`String user1PublicKey = user1.ExportPublicKeyString();`  
 
 `CryptoLib.CryptoRSA user2 = new CryptoRSA();`  
 `user2.ImportPublicKeyString(user1PublicKey);`  
