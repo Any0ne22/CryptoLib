@@ -81,3 +81,4 @@ CryptoLib v1.0 implémente les algorithmes suivants:
 ### V1.1
 -Adding class CryptoDeriveBytes  
 -The CryptoAES class use the CryptoDeriveBytes to get a derived key from a password  
+-Adding ECB cipher mode to CryptoAES  
