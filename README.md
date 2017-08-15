@@ -7,7 +7,7 @@ CryptoLib is available in multiples languages (C#, Java) and the syntax is pract
 
 The detailed documentation is available on the [wiki](https://github.com/Any0ne22/CryptoLib/wiki).
 
-CryptoLib v1.0 implements the following algorithms:  
+CryptoLib v1.1 implements the following algorithms:  
 -AES ([CryptoAES](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoAES))  
 -RSA ([CryptoRSA](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoRSA))  
 -PBKDF2 key derivation algorithm  
@@ -21,7 +21,7 @@ CryptoLib est disponible dans plusieurs languages (C#, Java) et la syntaxe des o
 
 La documentation détaillée de CryptoLib est disponible sur le [wiki](https://github.com/Any0ne22/CryptoLib/wiki).
 
-CryptoLib v1.0 implémente les algorithmes suivants:  
+CryptoLib v1.1 implémente les algorithmes suivants:  
 -AES ([CryptoAES](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoAES))  
 -RSA ([CryptoRSA](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoRSA))  
 -L'algorithme de dérivation de clé PBKDF2  
