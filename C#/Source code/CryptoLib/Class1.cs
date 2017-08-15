@@ -1,5 +1,5 @@
-﻿/*
-CryptoLib v1.0
+/*
+CryptoLib v1.1
 Made by Tom Gouville
 https://github.com/Any0ne22/CryptoLib/
 */
@@ -16,8 +16,9 @@ namespace CryptoLib
 {
     public class CryptoAES
     {
-        private byte[] key = null;
-        private byte[] iv = null;
+        private byte[] key = new byte[32];
+        private byte[] iv = new byte[16];
+        private CipherMode mode = CipherMode.CBC;
 
         public CryptoAES(string password = null)
         {
@@ -25,14 +26,33 @@ namespace CryptoLib
                 GenerateAlgotihmInputs(password);
         }
 
-        public List<byte[]> GenerateAlgotihmInputs(string password)
+        public void setCipherMode(string cipherMode)
+        {
+        	if(cipherMode == "CBC")
+            {
+                mode = CipherMode.CBC;
+            }
+        	else if(cipherMode == "ECB")
+            {
+                mode = CipherMode.ECB;
+            }
+        	else
+            {
+                throw new ArgumentException("Bad cipher mode!");
+            }
+        }
+
+        public List<byte[]> GenerateAlgotihmInputs(string password, string hmacAlgorithm = null, int derivationIterationsCount = 10000)
         {
             List<byte[]> result = new List<byte[]>();
 
-            Rfc2898DeriveBytes rfcDb = new Rfc2898DeriveBytes(password, System.Text.Encoding.UTF8.GetBytes(password));
+            CryptoDeriveBytes derivation = new CryptoDeriveBytes();
+            if (hmacAlgorithm != null)
+                derivation.SetPseudoRandomFunction(hmacAlgorithm);
+            byte[] derivedKey = derivation.DerivesBytes(password, Encoding.UTF8.GetBytes(password), derivationIterationsCount, 64);
 
-            key = rfcDb.GetBytes(32);
-            iv = rfcDb.GetBytes(16);
+            Array.Copy(derivedKey, 0, key, 0, 32);
+            Array.Copy(derivedKey, 32, iv, 0, 16);
 
             result.Add(key);
             result.Add(iv);
@@ -60,7 +80,7 @@ namespace CryptoLib
             RijndaelManaged rijndael = new RijndaelManaged();
 
             // Définit le mode utilisé
-            rijndael.Mode = CipherMode.CBC;
+            rijndael.Mode = mode;
 
             // Crée le chiffreur AES - Rijndael
             ICryptoTransform aesEncryptor = rijndael.CreateEncryptor(encryptKey, encryptIv);
@@ -102,7 +122,7 @@ namespace CryptoLib
 
 
             RijndaelManaged rijndael = new RijndaelManaged();
-            rijndael.Mode = CipherMode.CBC;
+            rijndael.Mode = mode;
 
 
             // Ecris les données déchiffrées dans le MemoryStream
@@ -404,5 +424,164 @@ namespace CryptoLib
             return t;
         }
 
+    }
+
+    public class CryptoDeriveBytes
+    {
+        //This class follows the RFC8018 recommendations for key derivation
+
+        private int hLen = 32;      //length in octets of pseudorandom function output (default HMAC-SHA256)
+        private string selectedHMACFunction = "HMACSHA256";
+
+        public CryptoDeriveBytes(string pseudoRandomFunctionName = null)
+        {
+            if (pseudoRandomFunctionName != null)
+                SetPseudoRandomFunction(pseudoRandomFunctionName);
+        }
+
+        public void SetPseudoRandomFunction(string functionName)
+        {
+            if (functionName == "HMACSHA1")
+            {
+                selectedHMACFunction = "HMACSHA1";
+                hLen = 20;
+            }
+            else if(functionName == "HMACSHA256")
+            {
+                selectedHMACFunction = "HMACSHA256";
+                hLen = 32;
+            }
+            else if (functionName == "HMACSHA384")
+            {
+                selectedHMACFunction = "HMACSHA384";
+                hLen = 48;
+            }
+            else if (functionName == "HMACSHA512")
+            {
+                selectedHMACFunction = "HMACSHA512";
+                hLen = 64;
+            }
+            else
+            {
+                throw new ArgumentException("bad algorithm name");
+            }
+        }
+
+
+        public byte[] DerivesBytes(string password, byte[] salt, int c, int dkLen)
+        {
+            if (password.Length < 8)
+                throw new ArgumentException("password is too short");
+            if (salt.Length < 8)
+                throw new ArgumentException("salt is too short");
+            if (c < 1000)
+                throw new ArgumentException("c is too small to be safe");
+
+            byte[] bytePassword = Encoding.UTF8.GetBytes(password);
+
+            int l = (int)Math.Ceiling((double)dkLen / hLen); //length in blocks of derived key, a positive integer
+            int r = dkLen - (l - 1) * hLen; //the number of octets in the last block
+
+
+            IEnumerable<byte> DK = F(bytePassword, salt, c, 0);
+
+            for(int i = 1; i < l; i++)
+            {
+                DK = DK.Concat(F(bytePassword, salt, c, i));
+            }
+
+            byte[] copyOfDK = DK.ToArray();
+            byte[] DerivedKEY = new byte[dkLen];
+            for(int i = 0; i < dkLen; i++)
+            {
+                DerivedKEY[i] = copyOfDK[i];
+            }
+
+            return DerivedKEY;
+        }
+
+        private byte[] F(byte[] password, byte[] salt, int c, int dkIndexBlock)
+        {
+            byte[] byteI = BitConverter.GetBytes(dkIndexBlock);
+            if(BitConverter.IsLittleEndian)
+                Array.Reverse(byteI);
+
+            IEnumerable<byte> saltI = salt.Concat(byteI);
+
+            var U = HMAC(password, saltI.ToArray());
+
+            byte[] sortie = U;
+
+            for(int j = 1; j < c; j++)
+            {
+                sortie = exclusiveOR(sortie, U);
+                U = HMAC(password, U);
+            }
+            sortie = exclusiveOR(sortie, U);
+
+            return U;
+        }
+
+
+        private byte[] HMAC(byte[] key, byte[] message)
+        {
+            if (selectedHMACFunction == "HMACSHA1")
+            {
+                return HashHMACSHA1(key, message);
+            }
+            else if (selectedHMACFunction == "HMACSHA256")
+            {
+                return HashHMACSHA256(key, message);
+            }
+            else if (selectedHMACFunction == "HMACSHA384")
+            {
+                return HashHMACSHA384(key, message);
+            }
+            else if (selectedHMACFunction == "HMACSHA512")
+            {
+                return HashHMACSHA512(key, message);
+            }
+            else
+            {
+                throw new CryptographicException("Error as occured");
+            }
+        }
+
+        private byte[] HashHMACSHA1(byte[] key, byte[] message)
+        {
+            var hash = new HMACSHA1(key);
+            return hash.ComputeHash(message);
+        }
+
+        private byte[] HashHMACSHA256(byte[] key, byte[] message)
+        {
+            var hash = new HMACSHA256(key);
+            return hash.ComputeHash(message);
+        }
+
+        private byte[] HashHMACSHA384(byte[] key, byte[] message)
+        {
+            var hash = new HMACSHA384(key);
+            return hash.ComputeHash(message);
+        }
+
+        private byte[] HashHMACSHA512(byte[] key, byte[] message)
+        {
+            var hash = new HMACSHA512(key);
+            return hash.ComputeHash(message);
+        }
+
+        private static byte[] exclusiveOR(byte[] arr1, byte[] arr2)
+        {
+            if (arr1.Length != arr2.Length)
+                throw new ArgumentException("arr1 and arr2 are not the same length");
+
+            byte[] result = new byte[arr1.Length];
+
+            for (int i = 0; i < arr1.Length; ++i)
+                result[i] = (byte)(arr1[i] ^ arr2[i]);
+
+            return result;
+        }
     }
 }
