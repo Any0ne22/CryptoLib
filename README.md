@@ -10,7 +10,7 @@ The detailed documentation is available on the [wiki](https://github.com/Any0ne2
 CryptoLib v1.1 implements the following algorithms:  
 -AES ([CryptoAES](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoAES))  
 -RSA ([CryptoRSA](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoRSA))  
--PBKDF2 key derivation algorithm  
+-PBKDF2 key derivation algorithm ([CryptoDeriveBytes](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoDeriveBytes))  
 
 
 ## FR:
@@ -24,7 +24,8 @@ La documentation détaillée de CryptoLib est disponible sur le [wiki](https://g
 CryptoLib v1.1 implémente les algorithmes suivants:  
 -AES ([CryptoAES](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoAES))  
 -RSA ([CryptoRSA](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoRSA))  
--L'algorithme de dérivation de clé PBKDF2  
+-L'algorithme de dérivation de clé PBKDF2 ([CryptoDeriveBytes](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoDeriveBytes))  
+
 
 
 # Versions:  
