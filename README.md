@@ -76,7 +76,7 @@ CryptoLib v1.0 implémente les algorithmes suivants:
 
 `String decipheredData = user1.DecryptString(cipheredData);`  
 
-#ChangeLogs
+# ChangeLogs
 
 ### V1.1
 -Adding class CryptoDeriveBytes  
