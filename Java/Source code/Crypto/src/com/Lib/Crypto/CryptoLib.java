@@ -1,13 +1,15 @@
 /*
-CryptoLib v1.0
+CryptoLib v1.1
 Made by Tom Gouville
 https://github.com/Any0ne22/CryptoLib/
 */
 package com.Lib.Crypto;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -18,11 +20,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateCrtKey;
-import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.RSAPrivateCrtKeySpec;
-import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
@@ -46,9 +47,9 @@ public class CryptoLib {
     {
         private byte[] key = new byte[32];
         private byte[] iv = new byte[16];
+        private String mode = "CBC";
 
-
-        public CryptoAES(String password)
+        public CryptoAES(String password) throws Throwable
         {
             if(password!=null)
                 GenerateAlgotihmInputs(password);
@@ -57,17 +58,39 @@ public class CryptoLib {
         public CryptoAES() {
 			
 		}
+        
+        public void setCipherMode(String cipherMode) throws Throwable
+        {
+        	if(cipherMode == "CBC")
+        	{
+        		mode = "CBC";
+        	}
+        	else if(cipherMode == "ECB")
+        	{
+        		mode = "ECB";
+        	}
+        	else
+        	{
+        		throw new Throwable("Bad cipher mode!");
+        	}
+        }
 
-		public List<byte[]> GenerateAlgotihmInputs(String password)
+        public List<byte[]> GenerateAlgotihmInputs(String password) throws Throwable
+        {
+            return GenerateAlgotihmInputs(password, "HMACSHA256" , 10000);
+        }
+        
+		public List<byte[]> GenerateAlgotihmInputs(String password, String hmacAlgorithm , int derivationIterationsCount) throws Throwable
         {
             List<byte[]> result = new ArrayList<byte[]>();
 
             try {
-                SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-                PBEKeySpec pbeKeySpec = new PBEKeySpec(password.toCharArray(), password.getBytes("UTF-8"), 1000, 384);
-                Key secretKey = factory.generateSecret(pbeKeySpec);
-                System.arraycopy(secretKey.getEncoded(), 0, key, 0, 32);
-                System.arraycopy(secretKey.getEncoded(), 32, iv, 0, 16);
+            	CryptoDeriveBytes derivation = new CryptoDeriveBytes();
+                derivation.SetPseudoRandomFunction(hmacAlgorithm);
+                byte[] derivedKey = derivation.DerivesBytes(password, password.getBytes("UTF-8"), derivationIterationsCount, 64);
+                
+                System.arraycopy(derivedKey, 0, key, 0, 32);
+                System.arraycopy(derivedKey, 32, iv, 0, 16);
 
                 result.add(key);
                 result.add(iv);
@@ -85,8 +108,15 @@ public class CryptoLib {
             try {
                 SecretKeySpec secret = new SecretKeySpec(encryptKey, "AES");
                 AlgorithmParameterSpec ivSpec = new IvParameterSpec(encryptIv);
-                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-                cipher.init(Cipher.ENCRYPT_MODE, secret, ivSpec);
+                Cipher cipher = Cipher.getInstance("AES/"+ mode +"/PKCS5Padding");
+                if(mode == "CBC")
+                {
+                	cipher.init(Cipher.ENCRYPT_MODE, secret, ivSpec);
+                }
+                else
+                {
+                	cipher.init(Cipher.ENCRYPT_MODE, secret);
+                }
                 byte[] result = cipher.doFinal(clearText.getBytes("UTF-8"));
 
                 sortie = Base64.getEncoder().encodeToString(result);
@@ -110,8 +140,15 @@ public class CryptoLib {
             try {
                 SecretKeySpec secret = new SecretKeySpec(encryptKey, "AES");
                 AlgorithmParameterSpec ivSpec = new IvParameterSpec(encryptIv);
-                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-                cipher.init(Cipher.DECRYPT_MODE, secret, ivSpec);
+                Cipher cipher = Cipher.getInstance("AES/" + mode + "/PKCS5Padding");
+                if(mode == "CBC")
+                {
+                	cipher.init(Cipher.DECRYPT_MODE, secret, ivSpec);
+                }
+                else
+                {
+                	cipher.init(Cipher.DECRYPT_MODE, secret);
+                }
                 byte[] result = cipher.doFinal(cipherTextUTF8);
 
                 sortie = new String(result, StandardCharsets.UTF_8);
@@ -306,6 +343,7 @@ public class CryptoLib {
             BigInteger Q = clePriveRSA.getPrimeQ();
             
             
+            
             byte[] byteExposant = exposant.toByteArray();
             if (byteExposant[0] == 0) {						//Suppression de l'octet de signe
                 byte[] tmp = new byte[byteExposant.length - 1];
@@ -395,6 +433,184 @@ public class CryptoLib {
         		throw new Throwable("Invalid key!");
         	}
         }
+    }
+    
+    static public class CryptoDeriveBytes
+    {
+        //This class follows the RFC8018 recommendations for key derivation
 
+        private int hLen = 32;      //length in octets of pseudorandom function output (default HMAC-SHA256)
+        private String selectedHMACFunction = "HMACSHA256";
+
+        
+        public CryptoDeriveBytes()
+        {
+            
+        }
+        
+        public CryptoDeriveBytes(String pseudoRandomFunctionName) throws Throwable
+        {
+            SetPseudoRandomFunction(pseudoRandomFunctionName);
+        }
+
+        public void SetPseudoRandomFunction(String functionName) throws Throwable
+        {
+            if (functionName == "HMACSHA1")
+            {
+                selectedHMACFunction = "HMACSHA1";
+                hLen = 20;
+            }
+            else if(functionName == "HMACSHA256")
+            {
+                selectedHMACFunction = "HMACSHA256";
+                hLen = 32;
+            }
+            else if (functionName == "HMACSHA384")
+            {
+                selectedHMACFunction = "HMACSHA384";
+                hLen = 48;
+            }
+            else if (functionName == "HMACSHA512")
+            {
+                selectedHMACFunction = "HMACSHA512";
+                hLen = 64;
+            }
+            else
+            {
+            	throw new Throwable("bad algorithm name");
+            }
+        }
+
+
+        public byte[] DerivesBytes(String password, byte[] salt, int c, int dkLen) throws IOException, Throwable
+        {
+            if (password.length() < 8)
+            	throw new Throwable("password is too short");
+            if (salt.length < 8)
+            	throw new Throwable("salt is too short");
+            if (c < 1000)
+            	throw new Throwable("c is too small to be safe");
+
+            byte[] bytePassword = password.getBytes("UTF-8");
+
+            int l = (int)Math.ceil((double)dkLen / hLen); //length in blocks of derived key, a positive integer
+            int r = dkLen - (l - 1) * hLen; //the number of octets in the last block
+
+
+            ByteArrayOutputStream DK = new ByteArrayOutputStream( );
+            DK.write(F(bytePassword, salt, c, 0));
+
+            for(int i = 1; i < l; i++)
+            {
+            	DK.write(F(bytePassword, salt, c, i));
+            }
+
+            byte[] copyOfDK = DK.toByteArray();
+            byte[] DerivedKEY = new byte[dkLen];
+            for(int i = 0; i < dkLen; i++)
+            {
+                DerivedKEY[i] = copyOfDK[i];
+            }
+
+            return DerivedKEY;
+        }
+
+        private byte[] F(byte[] password, byte[] salt, int c, int dkIndexBlock) throws Throwable
+        {
+            byte[] byteI = ByteBuffer.allocate(4).putInt(dkIndexBlock).array();
+
+            
+            ByteArrayOutputStream saltI = new ByteArrayOutputStream( );
+            saltI.write( salt );
+            saltI.write( byteI );
+
+
+            byte[] U = HMAC(password, saltI.toByteArray());
+
+            byte[] sortie = U;
+
+            for(int j = 1; j < c; j++)
+            {
+                sortie = exclusiveOR(sortie, U);
+                U = HMAC(password, U);
+            }
+            sortie = exclusiveOR(sortie, U);
+
+            return U;
+        }
+
+
+        private byte[] HMAC(byte[] key, byte[] message) throws Throwable
+        {
+            if (selectedHMACFunction == "HMACSHA1")
+            {
+                return HashHMACSHA1(key, message);
+            }
+            else if (selectedHMACFunction == "HMACSHA256")
+            {
+                return HashHMACSHA256(key, message);
+            }
+            else if (selectedHMACFunction == "HMACSHA384")
+            {
+                return HashHMACSHA384(key, message);
+            }
+            else if (selectedHMACFunction == "HMACSHA512")
+            {
+                return HashHMACSHA512(key, message);
+            }
+            else
+            {
+            	throw new Throwable("Error as occured");
+            }
+        }
+
+        public byte[] HashHMACSHA1(byte[] key, byte[] message) throws InvalidKeyException, NoSuchAlgorithmException
+        {
+        	  Mac sha256_HMAC = Mac.getInstance("HmacSHA1");
+        	  SecretKeySpec secret_key = new SecretKeySpec(key, "HmacSHA1");
+        	  sha256_HMAC.init(secret_key);
+
+        	  return sha256_HMAC.doFinal(message);
+        }
+
+        public byte[] HashHMACSHA256(byte[] key, byte[] message) throws InvalidKeyException, NoSuchAlgorithmException
+        {
+        	  Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+        	  SecretKeySpec secret_key = new SecretKeySpec(key, "HmacSHA256");
+        	  sha256_HMAC.init(secret_key);
+
+        	  return sha256_HMAC.doFinal(message);
+        }
+
+        public byte[] HashHMACSHA384(byte[] key, byte[] message) throws InvalidKeyException, NoSuchAlgorithmException
+        {
+        	  Mac sha256_HMAC = Mac.getInstance("HmacSHA384");
+        	  SecretKeySpec secret_key = new SecretKeySpec(key, "HmacSHA384");
+        	  sha256_HMAC.init(secret_key);
+
+        	  return sha256_HMAC.doFinal(message);
+        }
+
+        public byte[] HashHMACSHA512(byte[] key, byte[] message) throws InvalidKeyException, NoSuchAlgorithmException
+        {
+        	  Mac sha256_HMAC = Mac.getInstance("HmacSHA512");
+        	  SecretKeySpec secret_key = new SecretKeySpec(key, "HmacSHA512");
+        	  sha256_HMAC.init(secret_key);
+
+        	  return sha256_HMAC.doFinal(message);
+        }
+
+        private byte[] exclusiveOR(byte[] arr1, byte[] arr2) throws Throwable
+        {
+            if (arr1.length != arr2.length)
+                throw new Throwable("arr1 and arr2 are not the same length");
+
+            byte[] result = new byte[arr1.length];
+
+            for (int i = 0; i < arr1.length; ++i)
+                result[i] = (byte)(arr1[i] ^ arr2[i]);
+
+            return result;
+        }
     }
 }
