@@ -10,6 +10,7 @@ The detailed documentation is available on the [wiki](https://github.com/Any0ne2
 CryptoLib v1.0 implements the following algorithms:  
 -AES ([CryptoAES](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoAES))  
 -RSA ([CryptoRSA](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoRSA))  
+-PBKDF2 key derivation algorithm  
 
 
 ## FR:
@@ -23,11 +24,12 @@ La documentation détaillée de CryptoLib est disponible sur le [wiki](https://g
 CryptoLib v1.0 implémente les algorithmes suivants:  
 -AES ([CryptoAES](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoAES))  
 -RSA ([CryptoRSA](https://github.com/Any0ne22/CryptoLib/wiki/(Fr)CryptoRSA))  
+-L'algorithme de dérivation de clé PBKDF2  
 
 
 # Versions:  
--C#: v1.0  
--Java: v1.0
+-C#: v1.1  
+-Java: v1.1
 
 
 # Examples  
@@ -73,3 +75,9 @@ CryptoLib v1.0 implémente les algorithmes suivants:
 `String cipheredData = user2.EncryptString("some clear text");`  
 
 `String decipheredData = user1.DecryptString(cipheredData);`  
+
+#ChangeLogs
+
+### V1.1
+-Adding class CryptoDeriveBytes  
+-The CryptoAES class use the CryptoDeriveBytes to get a derived key from a password  
