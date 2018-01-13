@@ -79,7 +79,7 @@ EZcipher v1.1 implémente les algorithmes suivants:
 
 # ChangeLogs
 
-### Changing repository name from CryptoLib to EZcipher
+-Changing repository name from CryptoLib to EZcipher
 
 ### V1.1
 -Adding class CryptoDeriveBytes  
