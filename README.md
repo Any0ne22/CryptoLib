@@ -79,6 +79,8 @@ EZcipher v1.1 implémente les algorithmes suivants:
 
 # ChangeLogs
 
+### Changing repository name from CryptoLib to EZcipher
+
 ### V1.1
 -Adding class CryptoDeriveBytes  
 -The CryptoAES class use the CryptoDeriveBytes to get a derived key from a password  
