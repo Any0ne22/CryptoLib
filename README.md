@@ -31,6 +31,7 @@ EZcipher v1.1 implémente les algorithmes suivants:
 # Versions:  
 -C#: v1.1  
 -Java: v1.1
+-Python: V0.1
 
 
 # Examples
